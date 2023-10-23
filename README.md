@@ -43,4 +43,4 @@ An optional section for the role authors to include contact information, or a we
 Test
 ----
 
-``ansible-playbook tests/test.yml -i tests/inventory --syntax-check`
+``ansible-playbook tests/test.yml -i tests/inventory --syntax-check``

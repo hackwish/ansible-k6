@@ -1,0 +1,77 @@
+# tasks file for ansible-k6 
+## Repos
+- name: Install Repo Key K6 Debian/Ubuntu
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+    keyring: /usr/share/keyrings/k6-archive-keyring.gpg
+    state: present
+  when:
+  - ansible_system == 'Linux'
+  - ansible_os_family == 'Debian'
+  tags: k6
+
+- name: Install Repo K6 Debian/Ubuntu
+  apt_repository:
+    repo: 'deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main'
+    state: present
+    update_cache: no
+  when:
+  - ansible_system == 'Linux'
+  - ansible_os_family == 'Debian'
+  tags: k6
+
+- name: apt-get update
+  shell: apt-get update
+  become: true
+  become_user: root
+  ignore_errors: true
+  when:
+  - ansible_system == 'Linux'
+  - ansible_os_family == 'Debian'
+  tags: k6
+
+- name: Install k6 Repo
+  ansible.builtin.dnf:
+    name: 'https://dl.k6.io/rpm/repo.rpm'
+    state: present
+  when:
+  - ansible_system == 'Linux'
+  - ansible_os_family == 'RHEL'
+  tags: k6
+
+- name: yum-clean-metadata
+  ansible.builtin.command: yum clean metadata
+  when:
+  - ansible_system == 'Linux'
+  - ansible_os_family == 'RHEL'
+  tags: k6
+
+## Installation
+- name: Install K6 on Linux
+  package:
+    name: k6
+    state: present
+  when:
+  - ansible_system == 'Linux'
+  tags: k6
+
+- name: Install K6 on MACOs
+  community.general.homebrew:
+    name: k6
+    state: present
+  when:
+  - ansible_system == 'Darwin'
+  tags: k6
+
+# Check install
+
+- command: k6 version
+  register: result_k6
+  failed_when: false
+  changed_when: false
+  tags: k6
+
+- debug:
+    var: result_k6.stdout
+  tags: k6
